@@ -87,7 +87,7 @@ function Navbar() {
                     <Box component='ul'
                         sx={{ flexGrow: 1, listStyleType: 'none', display: { xs: 'none', md: 'flex' } }} >
                         {links.map(link => (
-                            <Link key={link} href={`/`}>
+                            <Link key={link} href={`/`} passHref>
                                 <StyledTypography component='li' variant="subtitle1" >{link}</StyledTypography>
                             </Link>
                         ))}
