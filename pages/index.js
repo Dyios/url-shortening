@@ -12,9 +12,7 @@ export default function Home() {
       <Head>
         <title>Home</title>
         <meta name="description" content="Generate shorter links for your brand" />
-        <link rel="icon" href="/favicon.ico" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link rel="icon" href="/images/favicon-32x32.png" />
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet"></link>
       </Head>
       <Hero maxWidth='lg' sx={{ mt: { xs: 2, md: 7 } }} />

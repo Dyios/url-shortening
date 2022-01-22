@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Link from 'next/link'
-import Image from 'next/Image'
+import Image from 'next/image'
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -87,7 +87,7 @@ function Navbar() {
                     <Box component='ul'
                         sx={{ flexGrow: 1, listStyleType: 'none', display: { xs: 'none', md: 'flex' } }} >
                         {links.map(link => (
-                            <Link key={link} href={`/`}>
+                            <Link key={link} href={`/`} passHref>
                                 <StyledTypography component='li' variant="subtitle1" >{link}</StyledTypography>
                             </Link>
                         ))}

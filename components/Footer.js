@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
@@ -39,7 +40,7 @@ export default function Footer({ maxWidth, dat }) {
                         {
                             links.links.map(link => (
                                 <Stack key={link.link}>
-                                    <Link href='/'>
+                                    <Link href='/' passHref>
                                         <Typography sx={{ color: 'footerBackground.contrastText' }}
                                             textAlign={{ xs: 'center', md: 'left' }}
                                             mb={2}
@@ -49,7 +50,7 @@ export default function Footer({ maxWidth, dat }) {
                                     </Link>
                                     {
                                         link.subLinks.map(sublink => (
-                                            <Link key={sublink} href='/'>
+                                            <Link key={sublink} href='/' passHref>
                                                 <StyledTypography
                                                     color='text.secondary'
                                                     textAlign={{ xs: 'center', md: 'left' }}
@@ -68,9 +69,10 @@ export default function Footer({ maxWidth, dat }) {
                         {
                             socialIcons.map(icon => (
                                 <a key={icon} href={`https://${icon}.com`} target='_blank'
+                                    rel="noreferrer"
                                     className={styles.icon}
                                 >
-                                    <img
+                                    <Image
                                         src={`/images/icon-${icon}.svg`}
                                         width={24} height={24}
                                         alt={`${icon} icon`}

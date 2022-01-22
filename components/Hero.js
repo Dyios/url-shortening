@@ -18,7 +18,7 @@ function Hero({ maxWidth, sx }) {
             <Container maxWidth={maxWidth} sx={{ paddingBottom: { xs: '210px', md: '165px' } }}>
                 <Navbar />
                 <Grid sx={sx} container columns={{ xs: 1, md: 2 }} direction={{ xs: 'rom', md: 'row-reverse' }}>
-                    <Grid item sx={1} md={1} sx={{ mt: { xs: 2, md: 0 } }} >
+                    <Grid item xs={1} md={1} sx={{ mt: { xs: 2, md: 0 } }} >
                         <StyledImage src='/images/illustration-working.svg' alt='illustration' />
                     </Grid>
                     <Grid item container xs={1} md={1} mt={{ xs: 5, md: 10 }}
@@ -36,7 +36,7 @@ function Hero({ maxWidth, sx }) {
                             sx={{ maxWidth: '37ch', mt: { xs: 1.8, md: 0 } }}
                             textAlign={{ xs: 'center', md: 'left' }}
                         >
-                            Build your brand's recognition and get detailed insights on how your links are performing.
+                            Build your brand&apos;s recognition and get detailed insights on how your links are performing.
                         </Typography>
                         <ActionButton rounded size='h6'
                             sx={{ width: '200px', p: 1.3, mt: 4 }}
