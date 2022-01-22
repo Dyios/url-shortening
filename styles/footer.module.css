@@ -1,0 +1,9 @@
+.icon:not(:first-child) {
+  margin-left: 20px;
+}
+
+.icon:hover {
+  color: #00bcd4;
+  filter: invert(51%) sepia(95%) saturate(1704%) hue-rotate(148deg)
+    brightness(98%) contrast(101%);
+}

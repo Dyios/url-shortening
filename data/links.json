@@ -1,0 +1,29 @@
+{
+    "links": [
+        {
+            "link": "Features",
+            "subLinks": [
+                "Link shortening",
+                "Branded Links",
+                "Analytics"
+            ]
+        },
+        {
+            "link": "Resources",
+            "subLinks": [
+                "Blog",
+                "Developers",
+                "Support"
+            ]
+        },
+        {
+            "link": "Company",
+            "subLinks": [
+                "About",
+                "Our team",
+                "Careers",
+                "Contact"
+            ]
+        }
+    ]
+}
