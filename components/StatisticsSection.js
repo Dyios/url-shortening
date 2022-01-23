@@ -12,9 +12,9 @@ function StatisticsSection({ maxWidth }) {
             sx={{ backgroundColor: '#f0f1f6', pb: { xs: '80px', md: '120px' } }}
         >
             <Container maxWidth={maxWidth} >
-                <Stack component='section' spacing={{ xs: 0, md: 6 }} alignItems='center'>
+                <Stack component='section' spacing={{ xs: 2.8, md: 6 }} alignItems='center'>
                     <LinkInput />
-                    <Box>
+                    <Box pt={{ xs: 9, md: 8 }}>
                         <Typography component='h3' variant='h4' textAlign='center' fontWeight='bold'>
                             Advanced Statistics
                         </Typography>
@@ -30,7 +30,7 @@ function StatisticsSection({ maxWidth }) {
                     <CascadingCards />
                 </Stack>
             </Container>
-        </Container>
+        </Container >
     )
 }
 

@@ -13,11 +13,11 @@ const TypographyButton = styled(Button)(({ theme, size }) => ({
     }
 }))
 
-function ActionButton({ rounded, size, children, onClick, sx, href }) {
+function ActionButton({ rounded, size, children, onClick, sx, href, component }) {
     const theme = useTheme();
     const borderRadius = rounded ? theme.shape.rounded2 : theme.shape.rounded1;
     return (
-        <TypographyButton component='a' variant='contained'
+        <TypographyButton component={component ?? 'button'} variant='contained'
             sx={{ borderRadius: borderRadius, ...sx }}
             size={size}
             onClick={onClick}

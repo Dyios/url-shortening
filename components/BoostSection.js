@@ -16,7 +16,7 @@ function BoostSection({ maxWidth }) {
                 backgroundPosition: 'right',
             }}
         >
-            <Container maxWidth={maxWidth} sx={{ p: 7 }} >
+            <Container maxWidth={maxWidth} sx={{ py: 7 }} >
                 <Typography component='h2' variant='h4' fontWeight='bold'
                     color='background.contrastText'
                     textAlign='center'
