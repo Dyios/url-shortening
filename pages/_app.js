@@ -2,6 +2,9 @@ import '../styles/globals.css'
 import { ThemeProvider } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import { createTheme } from '@mui/material/styles';
+import { SessionProvider } from "next-auth/react"
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { ReactQueryDevtools } from 'react-query/devtools'
 
 let theme = createTheme({
   palette: {
@@ -12,6 +15,9 @@ let theme = createTheme({
     secondary: {
       main: 'hsl(257, 27%, 26%)',// navbar violet
       contrastText: 'hsl(324deg 100% 99%)',// navbar text mobile
+    },
+    error: {
+      main: 'hsl(0, 87%, 67%)'
     },
     background: {
       main: '#3a3053', // violet
@@ -42,14 +48,20 @@ theme.typography.h2 = {
   }
 }
 
-function MyApp({ Component, pageProps }) {
+// Create a client
+const queryClient = new QueryClient()
+
+function MyApp({ Component, pageProps: { session, ...pageProps } }) {
   return (
-    <>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Component {...pageProps} />
-      </ThemeProvider>
-    </>
+    <QueryClientProvider client={queryClient}>
+      <SessionProvider session={session}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <Component {...pageProps} />
+          <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
+        </ThemeProvider>
+      </SessionProvider>
+    </QueryClientProvider>
   )
 }
 

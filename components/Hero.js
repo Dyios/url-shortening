@@ -18,7 +18,7 @@ function Hero({ maxWidth, sx }) {
             <Container maxWidth={maxWidth} sx={{ paddingBottom: { xs: '210px', md: '165px' } }}>
                 <Navbar />
                 <Grid sx={sx} container columns={{ xs: 1, md: 2 }} direction={{ xs: 'rom', md: 'row-reverse' }}>
-                    <Grid item xs={1} md={1} sx={{ mt: { xs: 2, md: 0 } }} >
+                    <Grid item xs={1} md={1} sx={{ mt: { xs: 2, md: 0 }, position: 'relative' }} >
                         <StyledImage src='/images/illustration-working.svg' alt='illustration' />
                     </Grid>
                     <Grid item container xs={1} md={1} mt={{ xs: 5, md: 10 }}

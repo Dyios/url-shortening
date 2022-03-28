@@ -14,11 +14,14 @@ import Divider from '@mui/material/Divider';
 import { styled } from '@mui/material/styles';
 import ActionButton from './ActionButton';
 
+import { useSession, signIn, signOut } from "next-auth/react"
+
 import logo from '../public/images/logo.svg'
 
 const links = ['Features', 'Pricing', 'Resources'];
 
 const StyledTypography = styled(Typography)(({ theme }) => ({
+    // ...theme.typography.h6
     fontWeight: 'bold',
     marginRight: '30px',
     color: theme.palette.text.secondary,
@@ -39,8 +42,20 @@ const TypographyButton = styled(Button)(({ theme, size }) => ({
     }
 }))
 
+const handleSignIn = (e, handleCloseNavMenu) => {
+    e.preventDefault()
+    handleCloseNavMenu && handleCloseNavMenu()
+    signIn()
+}
+const handleSignOut = (e, handleCloseNavMenu) => {
+    e.preventDefault()
+    handleCloseNavMenu && handleCloseNavMenu()
+    signOut({ redirect: false })
+}
+
 function Navbar() {
     const [anchorElNav, setAnchorElNav] = useState(null);
+    const { data: session, status } = useSession();
 
     const handleOpenNavMenu = (event) => {
         setAnchorElNav(event.currentTarget);
@@ -65,8 +80,8 @@ function Navbar() {
         }
     }))
 
-    const StyledMenuItem = ({ item }) => (
-        <MenuItem key={item} onClick={handleCloseNavMenu}>
+    const StyledMenuItem = ({ item, handleClick = handleCloseNavMenu }) => (
+        <MenuItem key={item} onClick={handleClick}>
             <Typography sx={{ width: '100%', fontWeight: 'bold', m: 1 }}
                 variant="h6"
                 component="a"
@@ -93,10 +108,28 @@ function Navbar() {
                         ))}
                     </Box>
                     <Box sx={{ flexGrow: 0, display: { xs: 'none', md: 'flex' }, alignItems: 'center' }} >
-                        <StyledTypography variant="subtitle1">Login</StyledTypography>
-                        <ActionButton rounded size='subtitle1'>
-                            Sign up
-                        </ActionButton>
+                        {
+                            status === 'unauthenticated' ? (
+                                <>
+                                    <StyledTypography variant="subtitle1" component='a'
+                                        onClick={handleSignIn}
+                                    >
+                                        Login
+                                    </StyledTypography>
+                                    <ActionButton rounded size='subtitle1'
+                                        onClick={handleSignIn}
+                                    >
+                                        Sign up
+                                    </ActionButton>
+                                </>
+                            ) : (
+                                <ActionButton rounded size='subtitle1'
+                                    onClick={handleSignOut}
+                                >
+                                    Sign out
+                                </ActionButton>
+                            )
+                        }
                     </Box>
 
                     <Box sx={{ flexGrow: 0, display: { xs: 'flex', md: 'none' } }}>
@@ -132,14 +165,30 @@ function Navbar() {
                 >
                     {links.map((link) => <StyledMenuItem key={link} item={link} />)}
                     <Divider variant='middle' light sx={{ backgroundColor: 'text.secondary' }} />
-                    <StyledMenuItem item={'Login'} />
-                    <ActionButton size='h6'
-                        rounded
-                        onClick={handleCloseNavMenu}
-                        sx={{ width: '100%', p: 1, m: 1 }}
-                    >
-                        Sign up
-                    </ActionButton>
+                    {
+                        status === 'unauthenticated' ? (
+                            <>
+                                <StyledMenuItem item={'Login'}
+                                    handleClick={(e) => handleSignIn(e, handleCloseNavMenu)}
+                                />
+                                <ActionButton size='h6'
+                                    rounded
+                                    onClick={(e) => handleSignIn(e, handleCloseNavMenu)}
+                                    sx={{ width: '100%', p: 1, m: 1 }}
+                                >
+                                    Sign up
+                                </ActionButton>
+                            </>
+                        ) : (
+                            <ActionButton size='h6'
+                                rounded
+                                onClick={(e) => handleSignOut(e, handleCloseNavMenu)}
+                                sx={{ width: '100%', p: 1, m: 1 }}
+                            >
+                                Sign Out
+                            </ActionButton>
+                        )
+                    }
                 </StyledMenu>
             </Toolbar>
         </Container >
