@@ -109,7 +109,13 @@ function Navbar() {
                     </Box>
                     <Box sx={{ flexGrow: 0, display: { xs: 'none', md: 'flex' }, alignItems: 'center' }} >
                         {
-                            status === 'unauthenticated' ? (
+                            status === 'authenticated' ? (
+                                <ActionButton rounded size='subtitle1'
+                                    onClick={handleSignOut}
+                                >
+                                    Sign out
+                                </ActionButton>
+                            ) : (
                                 <>
                                     <StyledTypography variant="subtitle1" component='a'
                                         onClick={handleSignIn}
@@ -122,12 +128,6 @@ function Navbar() {
                                         Sign up
                                     </ActionButton>
                                 </>
-                            ) : (
-                                <ActionButton rounded size='subtitle1'
-                                    onClick={handleSignOut}
-                                >
-                                    Sign out
-                                </ActionButton>
                             )
                         }
                     </Box>

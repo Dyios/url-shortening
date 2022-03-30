@@ -9,6 +9,9 @@ import Typography from '@mui/material/Typography'
 import ActionButton from './ActionButton';
 import { styled, useTheme } from '@mui/material/styles';
 
+import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+
+import { useSession, signIn, signOut } from "next-auth/react"
 import { useQuery } from 'react-query'
 
 const StyledTextField = styled(TextField)(({ theme, error }) => ({
@@ -46,29 +49,25 @@ const StyledTypography = styled(Typography)(({ theme }) => ({
     },
 }))
 
-const fetchShortenedUrl = async (linkToShorten) => {
-    // const response = await fetch(`https://api.shrtco.de/v2/shorten?url=${linkToShorten}`)
-    // if (!response.ok) {
-    //     throw new Error('Network response was not ok')
-    // }
-    // return response.json()
-    return fetch(`https://api.shrtco.de/v2/shorten?url=${linkToShorten}`)
-        .then(response => response.json())
-        .then(data => data)
-}
-
 const copyToClipboard = (text, setCopiedLink) => {
     navigator.clipboard.writeText(text);
     setCopiedLink(text);
 }
 
+const getStoredLinks = () => JSON.parse(window.localStorage.getItem('linkList'))
+
 function LinkInput() {
+    const { data: session, status } = useSession();
+    const [canLogOut, setCanLogOut] = useState(false);// to clean list of links
+
     const [linkToShorten, setLinkToShorten] = useState('')
     const [linkToShortenError, setLinkToShortenError] = useState(false)
-    const [linkList, setLinkList] = useState([]);
     const [copiedLink, setCopiedLink] = useState(null);
+
+    const [linkList, setLinkList] = useState([]);
+
     // to center the component vertically
-    const [marginTop, setMarginTop] = useState(0)
+    const [marginTop, setMarginTop] = useState(0);
     const inputRef = useRef();
 
     const borderRadius = useTheme().shape.rounded1;
@@ -78,19 +77,13 @@ function LinkInput() {
     }
 
     const handleCopiedLink = () => {
-        // get list from localStorage if exist
-        const storedLinkList = JSON.parse(localStorage.getItem('linkList')) || []
-        if (storedLinkList !== []) {
-            setLinkList(storedLinkList);
-
-            // read clipboard to check if there is a copied link in it
-            navigator.clipboard.readText().then(clipboardText => {
-                storedLinkList.find(link => link.shortened === clipboardText) ?
-                    setCopiedLink(clipboardText)
-                    :
-                    setCopiedLink(null)
-            });
-        }
+        // read clipboard to check if there is a copied link in it
+        navigator.clipboard.readText().then(clipboardText => {
+            linkList.find(link => link.shortened === clipboardText) ?
+                setCopiedLink(clipboardText)
+                :
+                setCopiedLink(null)
+        })
     }
 
     useEffect(() => {
@@ -98,30 +91,76 @@ function LinkInput() {
         offsetInput();
         window.addEventListener('resize', offsetInput);
 
+        // read links from localStorage
+        const storedLinks = getStoredLinks();
+        storedLinks && setLinkList(storedLinks)
+
         // check if the link is in the clipboard
-        handleCopiedLink();
         window.addEventListener('focus', handleCopiedLink)
     }, [])
+
+    // read links from firestore
+    useEffect(() => {
+        if (status === "authenticated") {
+            setCanLogOut(true);
+
+            fetch(`/api/users?user=${session.user.email}`)
+                .then(res => res.json())
+                .then(data => {
+                    const fetchedData = data.links?.map(link => ({
+                        original: link.original_link, shortened: link.short_link
+                    })).reverse() || [];
+
+                    setLinkList(fetchedData)
+                })
+        }
+    }, [status])
+
+    // isLoginOut Event catcher
+    useEffect(() => {
+        canLogOut && status === 'unauthenticated' && setLinkList([])
+    }, [status])
+
+    // save in localStorage
+    useEffect(() => {
+        localStorage.setItem('linkList', JSON.stringify(linkList))
+    }, [linkList])
 
     const handleShortenUrl = useCallback(() => {
         const validUrlRegex = new RegExp(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g);
         if (linkToShorten === "") {
             setLinkToShortenError("Please add a link")
         }
+        else if (linkList.find(link => link.original === linkToShorten)) {
+            setLinkToShortenError("This link is already shortened")
+        }
         else if (validUrlRegex.test(linkToShorten)) {
             fetch(`https://api.shrtco.de/v2/shorten?url=${linkToShorten}`)
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data)
                     const { ok, result, error } = data;
                     if (ok) {
                         setLinkList((oldLinkList) => {
-                            const newLinkList = [{ link: linkToShorten, shortened: result.full_short_link2 },
+                            const newLinkList = [{ original: linkToShorten, shortened: result.full_short_link2 },
                             ...oldLinkList
                             ]
-                            localStorage.setItem('linkList', JSON.stringify(newLinkList))
+                            // save in firestore if auth
+                            if (status === 'authenticated') {
+                                fetch('/api/users', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        email: session.user.email,
+                                        original_link: linkToShorten,
+                                        short_link: result.full_short_link2
+                                    })
+                                })
+                            }
                             return newLinkList
                         })
+                        setLinkToShorten('')
                         setLinkToShortenError(false)
                     }
                     else {
@@ -186,8 +225,28 @@ function LinkInput() {
                             backgroundColor: 'background.contrastText',
                             padding: '1rem 1.7rem',
                             overflow: 'hidden',
+                            position: 'relative'
                         }}
                     >
+                        <Box sx={{
+                            position: 'absolute',
+                            right: '0',
+                            top: '0',
+                            width: "0",
+                            height: "0",
+                            borderBottom: '43px solid transparent',
+                            borderLeft: '43px solid transparent',
+                            borderRight: '43px solid hsl(0, 87%, 55%)',
+                        }}
+                        >
+                            <CancelOutlinedIcon fontSize="small" sx={{
+                                color: 'background.contrastText',
+                                position: 'absolute',
+                                right: '-39px',
+                                top: '3px',
+                                cursor: 'pointer'
+                            }} />
+                        </Box>
                         <Stack direction={{ xs: 'column', md: 'row' }}
                             spacing={{ xs: 2, md: 2.5 }}
                             alignItems={{ md: "center" }}
@@ -199,11 +258,11 @@ function LinkInput() {
                                     textOverflow: 'ellipsis',
                                     overflow: 'hidden',
                                 }}
-                                href={link.link}
+                                href={link.original}
                                 target="_blank"
                                 rel="noreferrer"
                             >
-                                {link.link}
+                                {link.original}
                             </StyledTypography>
                             <Divider
                                 sx={{
