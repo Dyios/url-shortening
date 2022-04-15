@@ -1,15 +1,13 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import Stack from '@mui/material/Stack';
-import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
-import Divider from '@mui/material/Divider';
 import TextField from '@mui/material/TextField'
-import Typography from '@mui/material/Typography'
 import ActionButton from './ActionButton';
+import LinkListItem from './linkListItem';
+import Collapse from '@mui/material/Collapse';
+import { TransitionGroup } from 'react-transition-group';
 import { styled, useTheme } from '@mui/material/styles';
 
-import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 
 import { useSession, signIn, signOut } from "next-auth/react"
 import { useQuery } from 'react-query'
@@ -43,17 +41,6 @@ const StyledTextField = styled(TextField)(({ theme, error }) => ({
     },
 }))
 
-const StyledTypography = styled(Typography)(({ theme }) => ({
-    '&:hover': {
-        cursor: 'pointer',
-    },
-}))
-
-const copyToClipboard = (text, setCopiedLink) => {
-    navigator.clipboard.writeText(text);
-    setCopiedLink(text);
-}
-
 const getStoredLinks = () => JSON.parse(window.localStorage.getItem('linkList'))
 
 function LinkInput() {
@@ -78,7 +65,7 @@ function LinkInput() {
 
     const handleCopiedLink = () => {
         // read clipboard to check if there is a copied link in it
-        navigator.clipboard.readText().then(clipboardText => {
+        navigator.clipboard?.readText().then(clipboardText => {
             linkList.find(link => link.shortened === clipboardText) ?
                 setCopiedLink(clipboardText)
                 :
@@ -126,7 +113,8 @@ function LinkInput() {
         localStorage.setItem('linkList', JSON.stringify(linkList))
     }, [linkList])
 
-    const handleShortenUrl = useCallback(() => {
+    const handleShortenUrl = useCallback((e) => {
+        e.preventDefault();
         const validUrlRegex = new RegExp(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g);
         if (linkToShorten === "") {
             setLinkToShortenError("Please add a link")
@@ -176,6 +164,7 @@ function LinkInput() {
     return (
         <Stack spacing={2} sx={{ width: '100%' }}>
             <Grid component="form" container ref={inputRef}
+                autoComplete="off"
                 direction={{ xs: 'column', md: 'row' }}
                 justifyContent="center"
                 p={{ xs: 3.5, md: 7 }}
@@ -194,6 +183,7 @@ function LinkInput() {
             >
                 <StyledTextField
                     id="link-to-shorten"
+                    type="url"
                     placeholder="Shorten a link here..."
                     sx={{
                         flexGrow: 1, marginRight: { xs: 0, md: 3 },
@@ -214,104 +204,28 @@ function LinkInput() {
                         paddingTop: { xs: 1.75, md: '6px' }, paddingBottom: { xs: 1.75, md: '6px' }
                     }}
                     onClick={handleShortenUrl}
+                    type='submit'
                 >
                     Shorten It!
                 </ActionButton>
             </Grid >
-            {
-                linkList.map(link => (
-                    <Paper key={link.shortened} elevation={1}
-                        sx={{
-                            backgroundColor: 'background.contrastText',
-                            padding: '1rem 1.7rem',
-                            overflow: 'hidden',
-                            position: 'relative'
-                        }}
-                    >
-                        <Box sx={{
-                            position: 'absolute',
-                            right: '0',
-                            top: '0',
-                            width: "0",
-                            height: "0",
-                            borderBottom: '43px solid transparent',
-                            borderLeft: '43px solid transparent',
-                            borderRight: '43px solid hsl(0, 87%, 55%)',
-                        }}
+            <TransitionGroup>
+                {
+                    linkList.map(link => (
+                        <Collapse key={link.shortened}
+                            sx={{ mt: '16px' }}
                         >
-                            <CancelOutlinedIcon fontSize="small" sx={{
-                                color: 'background.contrastText',
-                                position: 'absolute',
-                                right: '-39px',
-                                top: '3px',
-                                cursor: 'pointer'
-                            }} />
-                        </Box>
-                        <Stack direction={{ xs: 'column', md: 'row' }}
-                            spacing={{ xs: 2, md: 2.5 }}
-                            alignItems={{ md: "center" }}
-                        >
-                            <StyledTypography component='a' variant='h6'
-                                sx={{
-                                    flexGrow: 1,
-                                    whiteSpace: 'nowrap',
-                                    textOverflow: 'ellipsis',
-                                    overflow: 'hidden',
-                                }}
-                                href={link.original}
-                                target="_blank"
-                                rel="noreferrer"
-                            >
-                                {link.original}
-                            </StyledTypography>
-                            <Divider
-                                sx={{
-                                    width: '120%',
-                                    transform: 'translateX(-10%)',
-                                    display: { xs: 'block', md: 'none' },
-                                }}
+                            <LinkListItem
+                                link={link}
+                                setLinkList={setLinkList}
+                                copiedLink={copiedLink}
+                                setCopiedLink={setCopiedLink}
+                                TransitionComponent={Collapse}
                             />
-                            <StyledTypography component='a' variant='h6'
-                                color='primary.main'
-                                sx={{
-                                    whiteSpace: 'nowrap',
-                                    textOverflow: 'ellipsis',
-                                    overflow: 'hidden',
-                                }}
-                                href={link.shortened}
-                                target="_blank"
-                                rel="noreferrer"
-                            >
-                                {link.shortened}
-                            </StyledTypography>
-                            <Box sx={{ width: { xs: 'none', md: '120px' } }}>
-                                {copiedLink === link.shortened ? (
-                                    <ActionButton sx={{
-                                        width: '100%',
-                                        py: 1,
-                                        backgroundColor: 'background.main'
-                                    }}
-                                        size='subtitle1'
-                                        onClick={() => copyToClipboard(link.shortened, setCopiedLink)}
-                                    >
-                                        Copied!
-                                    </ActionButton>
-                                ) : (
-                                    <ActionButton sx={{
-                                        width: '100%',
-                                        py: 1,
-                                    }}
-                                        size='subtitle1'
-                                        onClick={() => copyToClipboard(link.shortened, setCopiedLink)}
-                                    >
-                                        Copy
-                                    </ActionButton>
-                                )}
-                            </Box>
-                        </Stack>
-                    </Paper>
-                ))
-            }
+                        </Collapse>
+                    ))
+                }
+            </TransitionGroup>
         </Stack >
     )
 }
