@@ -8,9 +8,7 @@ import Collapse from '@mui/material/Collapse';
 import { TransitionGroup } from 'react-transition-group';
 import { styled, useTheme } from '@mui/material/styles';
 
-
-import { useSession, signIn, signOut } from "next-auth/react"
-import { useQuery } from 'react-query'
+import { useSession } from "next-auth/react"
 
 const StyledTextField = styled(TextField)(({ theme, error }) => ({
     '& .MuiOutlinedInput-root': {

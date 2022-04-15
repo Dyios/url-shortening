@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import Link from 'next/link'
 import Image from 'next/image'
 import Toolbar from '@mui/material/Toolbar';
@@ -53,6 +53,21 @@ const handleSignOut = (e, handleCloseNavMenu) => {
     signOut({ redirect: false })
 }
 
+const StyledMenu = styled(Menu)(({ theme }) => ({
+    maxWidth: theme.breakpoints.values.sm,
+    marginTop: '20px',
+    '& > *': {
+        width: '100%',
+    },
+    '& .MuiPaper-root': {
+        padding: '25px 40px',
+        borderRadius: '10px',
+        boxShadow: 'none',
+        backgroundColor: theme.palette.secondary.main,
+        color: theme.palette.text.secondary.contrastText,
+    }
+}))
+
 function Navbar() {
     const [anchorElNav, setAnchorElNav] = useState(null);
     const { data: session, status } = useSession();
@@ -65,23 +80,8 @@ function Navbar() {
         setAnchorElNav(null);
     };
 
-    const StyledMenu = styled(Menu)(({ theme }) => ({
-        maxWidth: theme.breakpoints.values.sm,
-        marginTop: '20px',
-        '& > *': {
-            width: '100%',
-        },
-        '& .MuiPaper-root': {
-            padding: '25px 40px',
-            borderRadius: '10px',
-            boxShadow: 'none',
-            backgroundColor: theme.palette.secondary.main,
-            color: theme.palette.text.secondary.contrastText,
-        }
-    }))
-
-    const StyledMenuItem = ({ item, handleClick = handleCloseNavMenu }) => (
-        <MenuItem key={item} onClick={handleClick}>
+    const StyledMenuItem = useCallback(({ item, handleClick = handleCloseNavMenu }) => (
+        <MenuItem onClick={handleClick}>
             <Typography sx={{ width: '100%', fontWeight: 'bold', m: 1 }}
                 variant="h6"
                 component="a"
@@ -90,7 +90,7 @@ function Navbar() {
                 {item}
             </Typography>
         </MenuItem>
-    )
+    ), [])
 
     return (
         <Container sx={{ mt: 2 }} disableGutters >

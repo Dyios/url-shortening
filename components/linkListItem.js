@@ -18,7 +18,7 @@ const StyledTypography = styled(Typography)(({ theme }) => ({
 }))
 
 const copyToClipboard = (text, setCopiedLink) => {
-    navigator.clipboard.writeText(text);
+    navigator.clipboard?.writeText(text);
     setCopiedLink(text);
 }
 
