@@ -34,7 +34,7 @@ Users are able to:
 ![](./screenshots/mobile.png)
 ### Links
 
-- [Solution URL](https://www.frontendmentor.io/profile/Dyios)
+- [Solution URL](https://www.frontendmentor.io/solutions/url-shortening-using-nextjs-BJAIvIgHc)
 - [Live Site URL](https://url-shortening-dyios.vercel.app/)
 
 ## Built with
